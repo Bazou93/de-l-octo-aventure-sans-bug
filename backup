@@ -1,0 +1,49 @@
+import android.hardware.SensorManager;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.widget.TextView;
+
+public class MainActivity extends Activity implements SensorEventListener {
+
+  private SensorManager sensorManager;
+  private Sensor weightSensor;
+  private TextView weightTextView;
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+
+    // Initialise le capteur de poids
+    sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+    weightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_WEIGHT);
+
+    // Initialise le texte affichant le poids
+    weightTextView = (TextView) findViewById(R.id.weight_text_view);
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    // Enregistre l'activity comme écouteur du capteur de poids
+    sensorManager.registerListener(this, weightSensor, SensorManager.SENSOR_DELAY_NORMAL);
+  }
+
+  @Override
+  protected void onPause() {
+    super.onPause();
+    // Désactive l'écoute du capteur de poids
+    sensorManager.unregisterListener(this);
+  }
+
+  @Override
+  public void onSensorChanged(SensorEvent event) {
+    // Met à jour le texte affichant le poids lorsque le capteur de poids envoie de nouvelles données
+    weightTextView.setText(String.format("Poids : %.2f kg", event.values[0]));
+  }
+
+  @Override
+  public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    // Ne fait rien
+  }
+}
